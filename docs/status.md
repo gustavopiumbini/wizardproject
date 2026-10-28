@@ -23,4 +23,4 @@ _(nada ainda)_
 
 ## Relatório de testes
 
-_(preencher com comandos executados, data e resultado)_
+- 2026-10-28 — Setup do toolkit (sem código de aplicação): validações de configuração, descoberta em sessão nova e casos do harness registrados em `docs/setup.md`. Nenhum teste de produto existe ainda.
