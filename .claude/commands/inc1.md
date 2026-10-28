@@ -4,11 +4,11 @@ description: Incremento 1 — fundação, isolamento multiescola e fluxo vertica
 
 # Incremento 1 — Fundação e fluxo vertical
 
-Leia `CLAUDE.md` e as seções 1, 4, 5, 6, 7, 11, 19 e 22 de `docs/spec.md`. Entre em plan mode e apresente um plano curto antes de editar.
+Leia `AGENTS.md`, `CLAUDE.md` e as seções 1, 4, 5, 6, 7, 11, 19 e 22 de `docs/spec.md`. Entre em plan mode e apresente um plano curto antes de editar.
 
 ## Entregar
 
-1. **Base do projeto** com a stack do `CLAUDE.md`: Docker Compose (Postgres + Mailpit), scripts do pnpm, `.env.example` sem segredos, ESLint e TypeScript strict.
+1. **Base do projeto** com a stack do `AGENTS.md`: Docker Compose (Postgres + Mailpit), scripts do pnpm, `.env.example` sem segredos, ESLint (perfil do toolkit descrito em `docs/quality.md`) e TypeScript strict.
 2. **Identidade e tenancy:** Better Auth, Organization, SchoolUnit, Membership com papel, `requireContext()` e seleção de unidade quando o usuário tiver mais de uma.
 3. **Permissões:** `can(ctx, acao, recurso)` com negação por padrão, e a matriz de permissões documentada em `docs/permissoes.md`.
 4. **Acadêmico mínimo:** TeacherProfile, Student, ClassGroup, ClassMembership (com início e fim), Room, LessonOccurrence, LessonParticipant e TeacherAssignment.
@@ -28,5 +28,5 @@ Professor faz login → Hoje → abre a aula → vê a lista correta de alunos �
 
 - Rode `pnpm typecheck && pnpm lint && pnpm test && pnpm test:e2e` e relate os resultados reais.
 - Rode o subagente `revisor-isolamento`.
-- Atualize `docs/status.md`, `docs/decisoes.md` e a lista de comandos do `CLAUDE.md`.
+- Atualize `docs/status.md`, `docs/decisoes.md` e a lista de comandos do `AGENTS.md`.
 - Pare e apresente o resumo. Não comece o incremento 2 sem pedido.

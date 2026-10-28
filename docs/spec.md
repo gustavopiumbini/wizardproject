@@ -1,6 +1,6 @@
 # Especificação do produto — Aula em Dia
 
-Este documento é a referência de produto. As regras de engenharia permanentes estão no `CLAUDE.md`, e o escopo de cada etapa está nos comandos `/inc1` a `/inc5`.
+Este documento é a referência de produto. As regras de engenharia permanentes estão no `AGENTS.md` (com complementos do Claude Code em `CLAUDE.md`), e o escopo de cada etapa está nos comandos `/inc1` a `/inc5`.
 
 ## 1. Contexto e problema
 
