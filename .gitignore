@@ -1,0 +1,7 @@
+# Segredos locais (o .env.example sem segredos é versionado)
+.env
+.env.*
+!.env.example
+
+# Saída local do Graphify (não versionar por padrão)
+graphify-out/
