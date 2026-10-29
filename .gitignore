@@ -5,3 +5,12 @@
 
 # Saída local do Graphify (não versionar por padrão)
 graphify-out/
+
+# Dependências e build
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+coverage/
+test-results/
+playwright-report/

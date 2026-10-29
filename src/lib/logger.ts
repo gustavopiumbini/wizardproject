@@ -1,0 +1,26 @@
+// Logger de servidor: JSON em uma linha. Nunca registre segredos, contatos ou conteúdo de aula;
+// passe apenas IDs e códigos de evento.
+type Level = "debug" | "info" | "warn" | "error";
+type Fields = Record<string, unknown>;
+
+function serialize(fields: Fields): Fields {
+  const out: Fields = {};
+  for (const [key, value] of Object.entries(fields)) {
+    out[key] = value instanceof Error ? { name: value.name, message: value.message } : value;
+  }
+  return out;
+}
+
+function write(level: Level, event: string, fields: Fields = {}) {
+  if (level === "debug" && process.env.NODE_ENV === "production") return;
+  const line = JSON.stringify({ ts: new Date().toISOString(), level, event, ...serialize(fields) });
+  if (level === "error" || level === "warn") console.error(line);
+  else console.log(line);
+}
+
+export const logger = {
+  debug: (event: string, fields?: Fields) => write("debug", event, fields),
+  info: (event: string, fields?: Fields) => write("info", event, fields),
+  warn: (event: string, fields?: Fields) => write("warn", event, fields),
+  error: (event: string, fields?: Fields) => write("error", event, fields),
+};
