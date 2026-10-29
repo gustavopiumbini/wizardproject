@@ -27,6 +27,7 @@ export type LessonSummary = {
   roomName: string | null;
   teacherName: string | null;
   teacherRole: (typeof teacherAssignment.$inferSelect)["role"] | null;
+  plannedContent: string | null;
 };
 
 const summaryColumns = {
@@ -41,6 +42,7 @@ const summaryColumns = {
   roomName: room.name,
   teacherName: teacherProfile.displayName,
   teacherRole: teacherAssignment.role,
+  plannedContent: lessonOccurrence.plannedContent,
 };
 
 /** Consulta base de aulas, sempre restrita à organização e unidade do contexto. */
