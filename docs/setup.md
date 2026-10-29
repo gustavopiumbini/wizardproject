@@ -45,7 +45,7 @@ Registro do setup do Vibe Coding Toolkit neste repositório. Estados: **validado
 | Chrome DevTools MCP | Não instalado | — | Não se aplica agora (sem interface) |
 | Memória | Memória nativa = `CLAUDE.md` → `AGENTS.md` + documentos versionados; sem sistema externo | Projeto | **Validado**: sessão nova recuperou a regra 4 e a origem correta |
 | Obsidian | Não adotado | — | Não se aplica: sem necessidade nem destino autorizado |
-| Hooks do cliente | Nenhum próprio (os plugins trazem os seus) | — | Não se aplica |
+| Hooks do cliente | Nenhum hook próprio do projeto. Os plugins trazem hooks próprios (ex.: Caveman em SessionStart/UserPromptSubmit) | — | Não se aplica (hooks próprios) |
 | Anthropic Skills / plugins oficiais extras | Não instalados | — | Não se aplica: sem necessidade de artefatos de escritório ou ferramentas extras |
 | aia-harness | Não instalado | — | Não se aplica: duplicaria o harness do kit (settings e hooks próprios) |
 | Codex | Não usado | — | Não se aplica; `AGENTS.md` já serve a outros clientes |
@@ -93,7 +93,8 @@ Não executados: reaplicação em projeto representativo com cliente reiniciado,
 
 ## Pendências e próxima entrega
 
-1. **Push bloqueado:** o GitHub recusou o push (403, o app Claude não tem acesso ao repositório). Os commits estão locais no branch `claude/sharp-rubin-b63sbi`.
+1. **Risco aceito — plugins de terceiros:** os quatro plugins vêm de marketplaces no GitHub sem versão fixada (Ponytail e Caveman de contas pessoais) e executam hooks próprios fora do repositório. A verificação de reaplicação cobre só os arquivos do repositório. Ao atualizar plugins, revise as mudanças de hooks; para remover um, apague a entrada em `.claude/settings.json`.
+1. **Push em 2026-10-28:** recusado pelo GitHub (403, o app Claude sem acesso ao repositório); atualize este item quando o push ocorrer.
 2. Autenticar o Context7.
 3. Decidir se RTK, Graphify e agent-browser entram no script de setup do ambiente.
 4. Respostas da escola (spec §26) em `docs/decisoes.md` antes do `/inc4`.

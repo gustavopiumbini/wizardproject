@@ -15,7 +15,7 @@
 
 ## Banco de dados
 
-PostgreSQL local via Docker Compose, com dados fictícios do seed. Nunca use dados reais nem credenciais de produção em desenvolvimento; o `.env.example` não contém segredos.
+PostgreSQL local via Docker Compose, com dados fictícios do seed. Nunca use dados reais nem credenciais de produção em desenvolvimento; o `.env.example` (criado no `/inc1`) nunca deve conter segredos.
 
 ## Verificar
 

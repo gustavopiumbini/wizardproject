@@ -51,9 +51,11 @@ pnpm test                # Vitest (unit + integração com banco)
 pnpm test:e2e            # Playwright
 ```
 
-Verificação combinada antes de declarar algo pronto: `pnpm typecheck && pnpm lint && pnpm test`, mais os e2e do incremento.
+Verificação combinada antes de declarar algo pronto: `pnpm typecheck && pnpm lint && pnpm test`, mais os e2e do incremento. O `/inc1` acrescenta `pnpm lint:typed` e `pnpm lint:rules` (ver `docs/quality.md`); a partir daí eles fazem parte da verificação combinada.
 
 ## Estrutura planejada
+
+As camadas por módulo abaixo são exigidas pelo kit (não são abstração opcional para a regra de menor mudança).
 
 ```
 src/app/                    rotas e UI (pt-BR)

@@ -10,8 +10,10 @@
 | `pnpm lint` | ESLint (presets oficiais + regras do toolkit abaixo) | após `/inc1` |
 | `pnpm test` | Vitest: unidade e integração com Postgres real via Docker | após `/inc1` |
 | `pnpm test:e2e` | Playwright: fluxos ponta a ponta do incremento | após `/inc1` |
+| `pnpm lint:typed` | Regras tipadas de promessas (`no-floating-promises`, `no-misused-promises`) | após `/inc1` |
+| `pnpm lint:rules` | Self-check das regras locais de ESLint | após `/inc1` |
 
-Verificação combinada antes de declarar pronto: `pnpm typecheck && pnpm lint && pnpm test`, mais os e2e do incremento. Rode testes focados durante o trabalho e a suíte completa no fim. Relate apenas o que rodou de fato.
+Verificação combinada antes de declarar pronto: `pnpm typecheck && pnpm lint && pnpm lint:typed && pnpm lint:rules && pnpm test`, mais os e2e do incremento. Rode testes focados durante o trabalho e a suíte completa no fim. Relate apenas o que rodou de fato.
 
 ## Regras de base (aplicar no `/inc1`)
 
@@ -22,7 +24,7 @@ Fonte versionada: Vibe Coding Toolkit, revisão `790a895304e0c08b70a5b215c9d334f
 - `templates/eslint/next.typed.config.mjs.example` → `eslint.typed.config.mjs`: `no-floating-promises` e `no-misused-promises` como erro (projeto novo, sem legado). Meça tempo e memória no runner real.
 - Scripts sugeridos pelo toolkit: `lint:typed`, `lint:rules`; incluí-los na verificação combinada e na lista de comandos do `AGENTS.md`.
 
-Essas regras não substituem `requireContext()`, `can()`, validação Zod nem revisão.
+Sem acesso ao repositório do toolkit, implemente o equivalente com recursos nativos (presets oficiais, `max-lines` 350, as duas regras tipadas e `no-console` no servidor), registre a limitação em `docs/decisoes.md` e siga. Essas regras não substituem `requireContext()`, `can()`, validação Zod nem revisão.
 
 ## Estratégia de testes
 

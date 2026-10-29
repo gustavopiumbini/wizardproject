@@ -26,7 +26,7 @@ Professor faz login → Hoje → abre a aula → vê a lista correta de alunos �
 
 ## Ao terminar
 
-- Rode `pnpm typecheck && pnpm lint && pnpm test && pnpm test:e2e` e relate os resultados reais.
+- Rode `pnpm typecheck && pnpm lint && pnpm lint:typed && pnpm lint:rules && pnpm test && pnpm test:e2e` e relate os resultados reais.
 - Rode o subagente `revisor-isolamento`.
 - Atualize `docs/status.md`, `docs/decisoes.md` e a lista de comandos do `AGENTS.md`.
 - Pare e apresente o resumo. Não comece o incremento 2 sem pedido.
