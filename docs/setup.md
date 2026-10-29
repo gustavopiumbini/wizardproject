@@ -30,7 +30,7 @@ Registro do setup do Vibe Coding Toolkit neste repositório. Estados: **validado
 | Superpowers 7.0.0 | Instalado (`claude plugin install --scope project`) | Projeto | **Validado**: `claude plugin list` = enabled; descoberto numa sessão nova (`claude -p`) |
 | Ponytail 5.3.2 | Instalado; opções no padrão (registro local, sem webhook) | Projeto | **Validado**: enabled e descoberto |
 | Caveman 4.0.1 | Instalado. Aviso da CLI sobre dependências não instaladas não afeta: o hook usa só módulos nativos do Node (executado com sucesso) | Projeto | **Validado**: enabled e descoberto |
-| Context7 1.0.4 (plugin com MCP remoto) | Instalado; sem `.mcp.json` duplicado | Projeto | **Bloqueado**: `claude mcp list` = "Needs authentication"; consulta anônima real a `resolve-library-id` respondeu "Monthly quota exceeded" (IP compartilhado). Retomar: autenticar o servidor pelo `/mcp` numa sessão do Claude Code ou criar chave gratuita em context7.com e configurá-la fora do repositório. Até lá, documentação oficial |
+| Context7 | Plugin 1.0.4 instalado no projeto; consultas via conector Context7 da conta claude.ai | Projeto (plugin) + conta (conector) | **Validado** em 2026-10-29 pelo conector: `resolve-library-id` (Drizzle ORM) e `query-docs` (`/drizzle-team/drizzle-orm-docs`) retornaram documentação atual. O MCP do plugin continua "Needs authentication" (consulta anônima sem cota); é redundante com o conector |
 | Subagentes | Política de delegação em `AGENTS.md` | Projeto | **Validado** nesta execução (3 casos paralelos com arquivos disjuntos) |
 | Conjunto web da Vercel: `vercel-react-best-practices`, `vercel-composition-patterns`, `web-design-guidelines`, `writing-guidelines`, `vercel-react-view-transitions`, `vercel-optimize`, `deploy-to-vercel`, `vercel-cli-with-tokens` | Instalado (`npx --yes skills@latest add vercel-labs/agent-skills ... --agent claude-code --yes`). Deploy e tokens: instalados, nunca executados sem autorização | Projeto | **Validado** (instalação + descoberta); nenhuma execução |
 | `find-skills` | Instalado (`vercel-labs/skills`) | Projeto | Instalado e descoberto |
@@ -95,7 +95,7 @@ Não executados: reaplicação em projeto representativo com cliente reiniciado,
 
 1. **Risco aceito — plugins de terceiros:** os quatro plugins vêm de marketplaces no GitHub sem versão fixada (Ponytail e Caveman de contas pessoais) e executam hooks próprios fora do repositório. A verificação de reaplicação cobre só os arquivos do repositório. Ao atualizar plugins, revise as mudanças de hooks; para remover um, apague a entrada em `.claude/settings.json`.
 1. **Push:** recusado em 2026-10-28 (403, GitHub sem acesso); resolvido em 2026-10-29 após reconectar o GitHub, branch `claude/sharp-rubin-b63sbi` publicado.
-2. Autenticar o Context7.
+2. Context7 resolvido pelo conector da conta; decidir se o MCP do plugin (redundante, sem autenticação) fica.
 3. Decidir se RTK, Graphify e agent-browser entram no script de setup do ambiente.
 4. Respostas da escola (spec §26) em `docs/decisoes.md` antes do `/inc4`.
 5. Próxima entrega: `/inc1`, aplicando o perfil de ESLint de `docs/quality.md`.
