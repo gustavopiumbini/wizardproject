@@ -19,7 +19,7 @@ PostgreSQL local via Docker Compose, com dados fictícios do seed. Nunca use dad
 
 ## Verificar
 
-`pnpm typecheck && pnpm lint && pnpm test` e `pnpm test:e2e` (disponíveis após o `/inc1`). Detalhes em `docs/quality.md`.
+`pnpm typecheck && pnpm lint && pnpm lint:typed && pnpm lint:rules && pnpm test` e `pnpm test:e2e` (disponíveis após o `/inc1`). Detalhes em `docs/quality.md`.
 
 ## Agentes
 
