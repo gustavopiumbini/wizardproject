@@ -94,7 +94,7 @@ Não executados: reaplicação em projeto representativo com cliente reiniciado,
 ## Pendências e próxima entrega
 
 1. **Risco aceito — plugins de terceiros:** os quatro plugins vêm de marketplaces no GitHub sem versão fixada (Ponytail e Caveman de contas pessoais) e executam hooks próprios fora do repositório. A verificação de reaplicação cobre só os arquivos do repositório. Ao atualizar plugins, revise as mudanças de hooks; para remover um, apague a entrada em `.claude/settings.json`.
-1. **Push em 2026-10-28:** recusado pelo GitHub (403, o app Claude sem acesso ao repositório); atualize este item quando o push ocorrer.
+1. **Push:** recusado em 2026-10-28 (403, GitHub sem acesso); resolvido em 2026-10-29 após reconectar o GitHub, branch `claude/sharp-rubin-b63sbi` publicado.
 2. Autenticar o Context7.
 3. Decidir se RTK, Graphify e agent-browser entram no script de setup do ambiente.
 4. Respostas da escola (spec §26) em `docs/decisoes.md` antes do `/inc4`.
