@@ -1,30 +1,25 @@
 # Qualidade
 
-**Estado:** sem código; nenhuma verificação executável ainda. Esta página fixa o que cada verificação deve provar e o que o `/inc1` precisa instalar.
+**Estado:** todas as verificações abaixo existem e rodam desde o `/inc1`.
 
 ## Comandos
 
-| Comando | Prova | Disponível |
+| Comando | Prova | Medição no runner de nuvem (2026-10-29) |
 |---|---|---|
-| `pnpm typecheck` | TypeScript strict sem erros | após `/inc1` |
-| `pnpm lint` | ESLint (presets oficiais + regras do toolkit abaixo) | após `/inc1` |
-| `pnpm test` | Vitest: unidade e integração com Postgres real via Docker | após `/inc1` |
-| `pnpm test:e2e` | Playwright: fluxos ponta a ponta do incremento | após `/inc1` |
-| `pnpm lint:typed` | Regras tipadas de promessas (`no-floating-promises`, `no-misused-promises`) | após `/inc1` |
-| `pnpm lint:rules` | Self-check das regras locais de ESLint | após `/inc1` |
+| `pnpm typecheck` | TypeScript strict sem erros (`noUncheckedIndexedAccess` ligado) | 6,4 s |
+| `pnpm lint` | ESLint (presets oficiais + regras do toolkit abaixo) | 3,1 s |
+| `pnpm test` | Vitest: unidade e integração com Postgres real via Docker, banco `aula_test_*` criado e apagado por execução | 4,3 s (28 testes) |
+| `pnpm test:e2e` | Playwright (Chromium, viewport Pixel 7): recria `aula_e2e`, aplica migrações e seed, sobe `next dev` na porta 3100 | 23,6 s (2 testes) |
+| `pnpm lint:typed` | Regras tipadas de promessas (`no-floating-promises`, `no-misused-promises`) como erro, só em `src/` | 8,5 s (memória não medida) |
+| `pnpm lint:rules` | Self-check das regras locais de ESLint (RuleTester) | 0,7 s |
 
 Verificação combinada antes de declarar pronto: `pnpm typecheck && pnpm lint && pnpm lint:typed && pnpm lint:rules && pnpm test`, mais os e2e do incremento. Rode testes focados durante o trabalho e a suíte completa no fim. Relate apenas o que rodou de fato.
 
-## Regras de base (aplicar no `/inc1`)
+## Regras de base (aplicadas no `/inc1`)
 
-Fonte versionada: Vibe Coding Toolkit, revisão `790a895304e0c08b70a5b215c9d334f1c86b816c` (`https://github.com/soumatheusgomes/vibe-coding-toolkit/tree/790a895304e0c08b70a5b215c9d334f1c86b816c`). Copie da mesma revisão, sem misturar versões:
+Fonte: Vibe Coding Toolkit, revisão `790a895304e0c08b70a5b215c9d334f1c86b816c`. Copiados da mesma revisão: `templates/eslint/next-app.config.mjs.example` → `eslint.config.mjs`, `templates/eslint/eslint-rules/` → `eslint-rules/`, `templates/eslint/verify.mjs` → `scripts/verify-quality-rules.mjs`, `templates/eslint/next.typed.config.mjs.example` → `eslint.typed.config.mjs`. Ajustes ao projeto em `docs/decisoes.md`.
 
-- `templates/eslint/next-app.config.mjs.example` → `eslint.config.mjs` (perfil completo: presets Next/TypeScript, limite de 350 linhas por arquivo, sem `console` direto no servidor, sem acesso direto ao banco a partir de `src/app`/componentes, guardas do Drizzle para `update`/`delete` sem `where`). Ajuste caminhos (`@/db`, camadas) à estrutura real e escolha o logger de servidor do projeto, registrando a decisão em `docs/decisoes.md`.
-- Diretório `templates/eslint/eslint-rules/` inteiro → `eslint-rules/`; `templates/eslint/verify.mjs` → `scripts/verify-quality-rules.mjs` (self-check das regras locais).
-- `templates/eslint/next.typed.config.mjs.example` → `eslint.typed.config.mjs`: `no-floating-promises` e `no-misused-promises` como erro (projeto novo, sem legado). Meça tempo e memória no runner real.
-- Scripts sugeridos pelo toolkit: `lint:typed`, `lint:rules`; incluí-los na verificação combinada e na lista de comandos do `AGENTS.md`.
-
-Sem acesso ao repositório do toolkit, implemente o equivalente com recursos nativos (presets oficiais, `max-lines` 350, as duas regras tipadas e `no-console` no servidor), registre a limitação em `docs/decisoes.md` e siga. Essas regras não substituem `requireContext()`, `can()`, validação Zod nem revisão.
+Regras ativas: presets `core-web-vitals` e `typescript` do Next; `quality/max-lines` 350 por arquivo; `quality/no-direct-console` (servidor usa `src/lib/logger.ts`); `quality/no-direct-data-access` (páginas e componentes `.tsx` em `src/app`/`src/components` não importam `@/db`); `drizzle/enforce-update-with-where` e `enforce-delete-with-where` para `db` e `tx`. Essas regras não substituem `requireContext()`, `can()`, validação Zod nem revisão.
 
 ## Estratégia de testes
 
@@ -35,12 +30,14 @@ Sem acesso ao repositório do toolkit, implemente o equivalente com recursos nat
 - Provedores externos simulados de forma explícita; nenhum envio real. Mock, SQL gerado e banco real são evidências diferentes.
 - Não escreva testes que só repetem a implementação. Não declare cobertura que não foi medida.
 
+Testes por critério da spec §23 (incremento 1): 1 e 2 em `src/modules/tenancy/isolation.test.ts`; 3, 4 e 18 em `src/modules/attendance/attendance.test.ts`; 13 em `src/modules/academic/transfer.test.ts`; matriz de `can()` em `src/modules/tenancy/policy.test.ts`; limite de login em `src/modules/identity/throttle.test.ts`; logger sem dados de consulta em `src/lib/logger.test.ts`; fluxo ponta a ponta e seleção de unidade em `e2e/chamada.spec.ts`.
+
 Capacidades adotadas e quando provar cada uma:
 
-- `next-dev-loop`: só depois de existir servidor Next.js; exige versão compatível, Turbopack e agent-browser (não instalado na nuvem).
+- `next-dev-loop`: há servidor Next.js 16 com Turbopack, mas o agent-browser não está instalado na nuvem; no /inc1 a verificação visual foi feita com screenshots do Playwright.
 - `next-bundle-optimizer`: auditoria com medições comparáveis; sem uso até haver build.
 - `supabase-postgres-best-practices`: revisão de esquema, índices e migrações geradas antes de aplicar.
-- `shadcn`: inspecionar `components.json` depois que existir.
+- `shadcn`: `components.json` existe (estilo `base-nova`, Base UI, ícones lucide); inspecione antes de alterar componentes.
 - `differential-review`: diffs de tenancy, permissões, jobs e exportações.
 
 ## Revisão após implementação ou correções
@@ -59,4 +56,4 @@ Prompt reutilizável em `docs/prompts/revisao-seguranca.md` (bloco do prompt 13 
 
 ## Dependências e entrega
 
-Rode auditoria completa e de produção após instalar dependências; investigue avisos e registre riscos conhecidos. Lint e build passando não significam auditoria limpa. Sem hooks de Git, bloqueios de push ou exigência de branch. Atualize esta página junto com scripts e regras que mudarem.
+Rode auditoria completa e de produção após instalar dependências; investigue avisos e registre riscos conhecidos. Estado em 2026-10-29: `pnpm audit --prod` aponta 1 moderado (esbuild ≤0.24 via `better-auth` → peer `drizzle-kit` → `@esbuild-kit`; afeta só o servidor de desenvolvimento do esbuild, que o projeto não usa) e `pnpm audit` aponta também 1 baixo (deepmerge via CLI do shadcn, dependência de desenvolvimento). Sem correção publicada; reavaliar ao atualizar drizzle-kit. Lint e build passando não significam auditoria limpa. Sem hooks de Git, bloqueios de push ou exigência de branch. Atualize esta página junto com scripts e regras que mudarem.

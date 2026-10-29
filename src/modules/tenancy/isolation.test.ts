@@ -3,12 +3,12 @@ import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 import { db } from "@/db";
 import { AppError } from "@/lib/errors";
-import { lessonParticipant } from "@/modules/academic/schema";
+import { classMembership, lessonParticipant } from "@/modules/academic/schema";
 import { listOwnLessonsForDay, transferStudent } from "@/modules/academic/service";
 import { attendanceRecord } from "@/modules/attendance/schema";
 import { correctAttendance, getLessonAttendance, listAttendanceOverview, saveAttendance } from "@/modules/attendance/service";
 import { buildScenario, contextFor, type Scenario } from "@/test/fixtures";
-import { listUserUnits, loadContext } from "./service";
+import { listUserUnits, loadContext, unitBelongsToUser } from "./service";
 
 let s: Scenario;
 beforeAll(async () => {
@@ -116,5 +116,58 @@ describe("critério 2 — escola B não acessa dados da escola A conhecendo os I
         studentId: s.studentOrgB.id,
       }),
     ).rejects.toThrow();
+  });
+
+  it("o banco recusa participante ligado a vínculo de turma de outra escola", async () => {
+    const [foreign] = await db.select().from(classMembership).where(eq(classMembership.unitId, s.unitB1.id));
+    await expect(
+      db.insert(lessonParticipant).values({
+        organizationId: s.orgA.id,
+        unitId: s.unitA1.id,
+        lessonId: s.lessons.lessonToday.id,
+        studentId: s.studentA2.id,
+        classMembershipId: foreign!.id,
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("a troca de unidade não aceita unidade de outra organização", async () => {
+    expect(await unitBelongsToUser(db, s.users.coordinatorOrgB.id, s.unitA1.id)).toBe(false);
+    expect(await unitBelongsToUser(db, s.users.teacherA.id, s.unitB1.id)).toBe(false);
+    expect(await unitBelongsToUser(db, s.users.teacherA.id, s.unitA2.id)).toBe(true);
+  });
+});
+
+describe("isolamento entre unidades da mesma organização", () => {
+  it("a unidade A2 não vê aulas nem chamadas da A1", async () => {
+    const ctxA2 = await contextFor(s.users.teacherA.id, s.unitA2.id);
+    expect(await code(getLessonAttendance(db, ctxA2, s.lessons.lessonToday.id))).toBe("not_found");
+    // Sem perfil docente na A2: a lista Hoje é negada.
+    expect(await code(listOwnLessonsForDay(db, ctxA2, s.today))).toBe("forbidden");
+    const managerA2 = await contextFor(s.users.manager.id, s.unitA2.id);
+    expect(await listAttendanceOverview(db, managerA2, s.today)).toEqual([]);
+    expect(await code(getLessonAttendance(db, managerA2, s.lessons.lessonToday.id))).toBe("not_found");
+  });
+
+  it("coordenação da A1 não monta contexto na A2", async () => {
+    expect(await loadContext(db, s.users.coordinator.id, s.unitA2.id)).toBeNull();
+  });
+});
+
+describe("participante de outra aula", () => {
+  it("chamada e correção recusam participante que não é da aula", async () => {
+    const ctxB = await contextFor(s.users.teacherB.id, s.unitA1.id);
+    const [other] = await db.select().from(lessonParticipant).where(eq(lessonParticipant.lessonId, s.lessons.lessonToday.id));
+    expect(
+      await code(
+        saveAttendance(db, ctxB, {
+          lessonId: s.lessons.lessonTeacherB.id,
+          expectedVersion: 0,
+          marks: [{ participantId: other!.id, status: "present" }],
+          finalize: false,
+          confirmPending: false,
+        }),
+      ),
+    ).toBe("validation");
   });
 });

@@ -30,6 +30,11 @@ const TZ = "America/Sao_Paulo";
 function assertDemoEnvironment() {
   if (process.env.NODE_ENV === "production") throw new Error("Seed demonstrativo bloqueado em produção.");
   if (process.env.DEMO_MODE !== "true") throw new Error("Seed exige DEMO_MODE=true.");
+  // O seed apaga o banco inteiro: só em Postgres local, salvo liberação explícita.
+  const host = new URL(process.env.DATABASE_URL ?? "").hostname;
+  if (!["localhost", "127.0.0.1", "::1", "postgres"].includes(host) && process.env.SEED_ALLOW_REMOTE !== "true") {
+    throw new Error("Seed recusado: DATABASE_URL não aponta para um Postgres local.");
+  }
 }
 
 async function resetDatabase() {

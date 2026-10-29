@@ -1,5 +1,5 @@
 // Tabelas do Better Auth (identidade). Tenancy e papéis ficam em tenancy/schema.ts.
-import { boolean, index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 const timestamps = {
   createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
@@ -69,3 +69,11 @@ export const verification = pgTable(
   },
   (t) => [index("verification_identifier_idx").on(t.identifier)],
 );
+
+// Limite de tentativas de login (o rate limit do Better Auth só vale no handler HTTP, que não é usado).
+// A chave é um hash SHA-256 de "email:..." ou "ip:...", para não guardar e-mail ou IP em claro.
+export const loginThrottle = pgTable("login_throttle", {
+  key: text().primaryKey(),
+  attempts: integer().notNull(),
+  windowStartedAt: timestamp({ withTimezone: true }).notNull(),
+});

@@ -2,7 +2,6 @@ import { sql } from "drizzle-orm";
 import {
   check,
   date,
-  foreignKey,
   index,
   integer,
   pgEnum,
@@ -111,6 +110,7 @@ export const classMembership = pgTable(
   },
   (t) => [
     unitFk("class_membership_unit_fk", t),
+    tenantKey("class_membership_tenant_uq", t),
     sameTenantFk("class_membership_class_fk", t.classGroupId, t, classGroup),
     sameTenantFk("class_membership_student_fk", t.studentId, t, student),
     check("class_membership_dates_ck", sql`${t.endsOn} is null or ${t.endsOn} >= ${t.startsOn}`),
@@ -179,11 +179,7 @@ export const lessonParticipant = pgTable(
     unique("lesson_participant_id_lesson_uq").on(t.id, t.lessonId),
     sameTenantFk("lesson_participant_lesson_fk", t.lessonId, t, lessonOccurrence),
     sameTenantFk("lesson_participant_student_fk", t.studentId, t, student),
-    foreignKey({
-      name: "lesson_participant_membership_fk",
-      columns: [t.classMembershipId],
-      foreignColumns: [classMembership.id],
-    }),
+    sameTenantFk("lesson_participant_membership_fk", t.classMembershipId, t, classMembership),
   ],
 );
 

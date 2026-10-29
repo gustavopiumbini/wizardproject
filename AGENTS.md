@@ -13,6 +13,7 @@ Este arquivo vale para qualquer agente. Instruções exclusivas do Claude Code f
 | `docs/status.md` | Situação real: implementado, demonstrativo, dependente de credenciais e planejado |
 | `docs/decisoes.md` | Decisões técnicas (data, decisão, motivo, alternativas descartadas) e respostas da escola (§26) |
 | `docs/architecture.md` | Estrutura de código, fronteiras e dados (o que existe e o que é plano) |
+| `docs/permissoes.md` | Matriz de permissões e regras da chamada (espelha `src/modules/tenancy/policy.ts`) |
 | `docs/design.md` | Direção de interface e acessibilidade |
 | `docs/onboarding.md` | Preparação local e primeiro fluxo |
 | `docs/quality.md` | Verificações, testes, revisão e segurança |
@@ -33,33 +34,40 @@ Atualize o documento responsável na mesma mudança que altera comportamento, co
 - Mailpit para capturar e-mails em desenvolvimento
 - pnpm e Docker Compose (Postgres + Mailpit)
 
+O Next.js 16 tem mudanças incompatíveis com versões anteriores; antes de usar uma API do Next, consulte `node_modules/next/dist/docs/` ou o Context7.
+
 Antes de instalar qualquer pacote, confirme a versão estável atual e a compatibilidade na documentação oficial (Context7 ou fonte oficial). Não invente APIs de bibliotecas.
 
 ## Comandos
 
-Mantenha esta lista correta sempre que um script mudar. Estado atual: **nenhum script existe ainda**; todos são criados pelo `/inc1`. Até lá, não há lint, tipos, testes nem build para rodar.
+Mantenha esta lista correta sempre que um script mudar. Estado: criados no `/inc1`; detalhes em `docs/onboarding.md` e `docs/quality.md`.
 
 ```
 docker compose up -d     # Postgres + Mailpit
-pnpm dev                 # app
-pnpm worker              # fila, outbox e lembretes
+pnpm install
+pnpm dev                 # app (http://localhost:3000)
+pnpm worker              # fila pg-boss (sem jobs até o /inc3)
+pnpm build               # build de produção
+pnpm db:generate         # gera migração a partir dos schema.ts (revise antes de aplicar)
 pnpm db:migrate
-pnpm db:seed             # dados fictícios com datas relativas a hoje
+pnpm db:seed             # recria os dados fictícios, com datas relativas a hoje (exige DEMO_MODE=true)
 pnpm typecheck
 pnpm lint
-pnpm test                # Vitest (unit + integração com banco)
-pnpm test:e2e            # Playwright
+pnpm lint:typed          # regras tipadas de promessas
+pnpm lint:rules          # self-check das regras locais de ESLint
+pnpm test                # Vitest (unit + integração com Postgres real, banco descartável)
+pnpm test:e2e            # Playwright (recria o banco aula_e2e e sobe o app na porta 3100)
 ```
 
-Verificação combinada antes de declarar algo pronto: `pnpm typecheck && pnpm lint && pnpm test`, mais os e2e do incremento. O `/inc1` acrescenta `pnpm lint:typed` e `pnpm lint:rules` (ver `docs/quality.md`); a partir daí eles fazem parte da verificação combinada.
+Verificação combinada antes de declarar algo pronto: `pnpm typecheck && pnpm lint && pnpm lint:typed && pnpm lint:rules && pnpm test`, mais os e2e do incremento (`pnpm test:e2e`). Os testes exigem o Postgres do `docker compose` em `localhost:5432`.
 
-## Estrutura planejada
+## Estrutura
 
-As camadas por módulo abaixo são exigidas pelo kit (não são abstração opcional para a regra de menor mudança).
+Estrutura real em `docs/architecture.md`. As camadas por módulo abaixo são exigidas pelo kit (não são abstração opcional para a regra de menor mudança).
 
 ```
 src/app/                    rotas e UI (pt-BR)
-src/modules/<modulo>/       schema.ts, service.ts, policy.ts, actions.ts, *.test.ts
+src/modules/<modulo>/       schema.ts, service.ts, policy.ts, actions.ts, queries.ts, *.test.ts
   modulos: identity, tenancy, academic, schedule, attendance, makeup,
            followup, materials, notifications, integration, audit
 src/adapters/email|whatsapp|sponte/   isolados da lógica de negócio
@@ -140,13 +148,3 @@ Instaladas em `.claude/skills/` com `skills-lock.json`. Instalar não executa na
 ## Idioma
 
 A UI e a documentação são em português brasileiro. Identificadores de código ficam em inglês; comentários, em português.
-
-<!-- BEGIN:nextjs-agent-rules -->
-
-## This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->

@@ -29,7 +29,7 @@ export async function teacherDayPage(day: string) {
       : await db
           .select({ lessonId: attendanceSheet.lessonId, status: attendanceSheet.status })
           .from(attendanceSheet)
-          .where(and(eq(attendanceSheet.unitId, ctx.unitId), inArray(attendanceSheet.lessonId, ids)));
+          .where(and(eq(attendanceSheet.organizationId, ctx.organizationId), eq(attendanceSheet.unitId, ctx.unitId), inArray(attendanceSheet.lessonId, ids)));
   const byLesson = new Map(sheets.map((s) => [s.lessonId, s.status]));
   return { ctx, lessons: lessons.map((l) => ({ ...l, sheetStatus: byLesson.get(l.id) ?? ("none" as const) })) };
 }

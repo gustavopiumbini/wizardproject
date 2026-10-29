@@ -1,6 +1,6 @@
 # Design de interface
 
-**Estado:** nenhuma tela implementada. Direção extraída da spec §15 e §18; o catálogo de componentes será registrado quando o shadcn/ui for adotado no `/inc1`.
+**Estado:** telas do incremento 1 implementadas (login, seleção de unidade, Hoje, detalhe da aula com chamada e visão de chamadas da coordenação). Direção extraída da spec §15 e §18.
 
 ## Direção
 
@@ -11,7 +11,18 @@
 
 ## Sistema existente
 
-Nenhum ainda. Stack prevista: Tailwind + shadcn/ui. Use a skill `shadcn` para inspecionar a configuração antes de alterar componentes e preserve customizações.
+- shadcn/ui 4.23 com estilo `base-nova` (primitivas Base UI), cor base `neutral`, variáveis CSS em `src/app/globals.css`, ícones lucide. Configuração em `components.json`; use a skill `shadcn` antes de alterar componentes.
+- Componentes adotados em `src/components/ui/`: `button`, `input`, `label`, `badge`, `alert`. Os arquivos importam `cn` do pacote oficial `cn` (gerado pelo CLI); `src/lib/utils.ts` o reexporta.
+- Fonte do sistema (sem Google Fonts). Faixa demonstrativa em âmbar no topo de todas as páginas (`src/components/demo-banner.tsx`), lida por requisição.
+- Estado da chamada sempre em texto (`src/components/lesson-status.tsx`): "Chamada não iniciada", "Rascunho", "Finalizada", "Cancelada". Rótulos de frequência em `src/modules/attendance/labels.ts`.
+
+## Padrões das telas
+
+- **Hoje:** lista de aulas em blocos clicáveis, horário em destaque, "Próxima aula" marcada em texto, aviso quando o professor é substituto.
+- **Chamada:** um `fieldset` por aluno com rádios nativos em botões de 44 px de altura (uso com uma mão), barra fixa no rodapé com "Salvar rascunho" e "Finalizar chamada", estado de gravação em `role="status"` ("Alterações não salvas", "Rascunho salvo (HH:MM)"). Finalizar com pendentes mostra a quantidade e pede confirmação marcada. O formulário usa `onSubmit` com `startTransition` porque o React 19 reseta formulários com `action` e as marcações sumiriam.
+- **Correção:** aluno, novo registro e motivo obrigatório; histórico com valores antes → depois, autor, data e motivo.
+- **Coordenação:** tabela por dia com navegação dia anterior/hoje/próximo, estado da chamada em texto e contagem por situação.
+- Estados: `loading.tsx` ("Carregando…"), `error.tsx` com "Tentar novamente", `not-found.tsx` que não revela se o registro existe em outra escola, e rodapé "esta versão não funciona offline".
 
 ## Interação e estados
 

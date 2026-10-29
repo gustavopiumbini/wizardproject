@@ -50,9 +50,6 @@ importers:
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
-      shadcn:
-        specifier: ^4.23.0
-        version: 4.23.0
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
@@ -90,6 +87,9 @@ importers:
       eslint-plugin-drizzle:
         specifier: 0.2.3
         version: 0.2.3(eslint@10.13.0(jiti@2.7.0))
+      shadcn:
+        specifier: 4.23.0
+        version: 4.23.0
       tailwindcss:
         specifier: 4.3.3
         version: 4.3.3

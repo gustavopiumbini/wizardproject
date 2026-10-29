@@ -38,7 +38,7 @@ Registro do setup do Vibe Coding Toolkit neste repositório. Estados: **validado
 | `shadcn` | Instalado: stack prevê shadcn/ui | Projeto | Instalado e descoberto; `shadcn info` pendente até existir `components.json` |
 | `differential-review` (Trail of Bits, ref `main`) | Instalado para diffs sensíveis | Projeto | Instalado e descoberto; sem diff de código para usar |
 | `next-dev-loop`, `next-bundle-optimizer` (vercel/next.js, ref `canary`) | Instalados para quando houver app | Projeto | Instalados e descobertos; **não executados** (sem servidor Next.js; `next-dev-loop` também exige agent-browser) |
-| ESLint + regras do toolkit + perfil tipado | Especificado em `docs/quality.md`; `/inc1` aplica | — | Pendente (sem código) |
+| ESLint + regras do toolkit + perfil tipado | Aplicado no `/inc1` (`eslint.config.mjs`, `eslint.typed.config.mjs`, `eslint-rules/`) | Projeto | **Validado**: `pnpm lint`, `lint:typed` e `lint:rules` passam |
 | Graphify | `.graphifyignore` versionado; `graphify-out/` no `.gitignore` | Projeto | CLI **bloqueada** (global, ausente); grafo **não se aplica** agora (sem código) |
 | RTK | Não instalado (global; exige alterar config do cliente) | Usuário | **Bloqueado**: só persiste via script de setup do ambiente de nuvem |
 | agent-browser | Não instalado (global) | Usuário | **Bloqueado** como o RTK; necessário para `next-dev-loop` |
@@ -98,6 +98,7 @@ Não executados: reaplicação em projeto representativo com cliente reiniciado,
 2. Context7 resolvido pelo conector da conta; decidir se o MCP do plugin (redundante, sem autenticação) fica.
 3. Decidir se RTK, Graphify e agent-browser entram no script de setup do ambiente.
 4. Respostas da escola (spec §26) em `docs/decisoes.md` antes do `/inc4`.
-5. Próxima entrega: `/inc1`, aplicando o perfil de ESLint de `docs/quality.md`.
+5. `/inc1` concluído em 2026-10-29 (perfil de ESLint aplicado; ver `docs/status.md`). Próxima entrega: `/inc2`.
+6. No container de nuvem o daemon do Docker não sobe sozinho: o `/inc1` iniciou `dockerd` manualmente. Considerar iniciá-lo no script de setup do ambiente.
 
 Repetir este setup: rode de novo o prompt 12 do toolkit; ele deve detectar o que já existe e não duplicar plugins, skills ou seções. Atualizar skills: `npx --yes skills@latest update --project --yes` e revisar o diff de `skills-lock.json`. Reavaliar o harness após mudar instruções, skills ou plugins (`docs/quality.md`).

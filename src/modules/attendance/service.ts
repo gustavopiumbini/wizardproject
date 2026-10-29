@@ -38,7 +38,7 @@ async function recordsByParticipant(db: DbOrTx, ctx: AppContext, lessonId: strin
   const rows = await db
     .select({ participantId: attendanceRecord.participantId, status: attendanceRecord.status })
     .from(attendanceRecord)
-    .where(and(eq(attendanceRecord.unitId, ctx.unitId), eq(attendanceRecord.lessonId, lessonId)));
+    .where(and(eq(attendanceRecord.organizationId, ctx.organizationId), eq(attendanceRecord.unitId, ctx.unitId), eq(attendanceRecord.lessonId, lessonId)));
   return new Map(rows.map((r) => [r.participantId, r.status]));
 }
 
@@ -46,7 +46,7 @@ async function lockSheet(tx: DbOrTx, ctx: AppContext, lessonId: string) {
   const [sheet] = await tx
     .select()
     .from(attendanceSheet)
-    .where(and(eq(attendanceSheet.unitId, ctx.unitId), eq(attendanceSheet.lessonId, lessonId)))
+    .where(and(eq(attendanceSheet.organizationId, ctx.organizationId), eq(attendanceSheet.unitId, ctx.unitId), eq(attendanceSheet.lessonId, lessonId)))
     .for("update");
   return sheet ?? null;
 }
@@ -69,7 +69,7 @@ export async function getLessonAttendance(db: DbOrTx, ctx: AppContext, lessonId:
       })
       .from(attendanceSheet)
       .leftJoin(user, eq(user.id, attendanceSheet.finalizedBy))
-      .where(and(eq(attendanceSheet.unitId, ctx.unitId), eq(attendanceSheet.lessonId, lessonId))),
+      .where(and(eq(attendanceSheet.organizationId, ctx.organizationId), eq(attendanceSheet.unitId, ctx.unitId), eq(attendanceSheet.lessonId, lessonId))),
     db
       .select({
         id: attendanceRevision.id,
@@ -82,7 +82,7 @@ export async function getLessonAttendance(db: DbOrTx, ctx: AppContext, lessonId:
       })
       .from(attendanceRevision)
       .innerJoin(user, eq(user.id, attendanceRevision.authorId))
-      .where(and(eq(attendanceRevision.unitId, ctx.unitId), eq(attendanceRevision.lessonId, lessonId)))
+      .where(and(eq(attendanceRevision.organizationId, ctx.organizationId), eq(attendanceRevision.unitId, ctx.unitId), eq(attendanceRevision.lessonId, lessonId)))
       .orderBy(desc(attendanceRevision.createdAt)),
   ]);
   const sheet = sheetRows[0] ?? null;
@@ -175,7 +175,7 @@ export async function saveAttendance(db: DbOrTx, ctx: AppContext, input: SaveInp
         updatedAt: now,
         ...(input.finalize ? { status: "finalized" as const, finalizedAt: now, finalizedBy: ctx.userId } : {}),
       })
-      .where(and(eq(attendanceSheet.id, sheet.id), eq(attendanceSheet.unitId, ctx.unitId)))
+      .where(and(eq(attendanceSheet.id, sheet.id), eq(attendanceSheet.organizationId, ctx.organizationId), eq(attendanceSheet.unitId, ctx.unitId)))
       .returning({ version: attendanceSheet.version, status: attendanceSheet.status });
     if (!updated) throw new Error("chamada não atualizada");
     return updated;
@@ -226,7 +226,7 @@ export async function correctAttendance(db: DbOrTx, ctx: AppContext, input: Corr
     await tx
       .update(attendanceSheet)
       .set({ version: sql`${attendanceSheet.version} + 1`, updatedBy: ctx.userId, updatedAt: new Date() })
-      .where(and(eq(attendanceSheet.id, sheet.id), eq(attendanceSheet.unitId, ctx.unitId)));
+      .where(and(eq(attendanceSheet.id, sheet.id), eq(attendanceSheet.organizationId, ctx.organizationId), eq(attendanceSheet.unitId, ctx.unitId)));
     return { previousStatus: previous, newStatus: input.status };
   });
 }
@@ -262,7 +262,7 @@ export async function listAttendanceOverview(db: DbOrTx, ctx: AppContext, day: s
       .leftJoin(attendanceRecord, eq(attendanceRecord.participantId, lessonParticipant.id))
       .where(
         and(
-          eq(lessonParticipant.unitId, ctx.unitId),
+          eq(lessonParticipant.organizationId, ctx.organizationId), eq(lessonParticipant.unitId, ctx.unitId),
           inArray(lessonParticipant.lessonId, ids),
           isNull(lessonParticipant.removedAt),
         ),
@@ -271,7 +271,7 @@ export async function listAttendanceOverview(db: DbOrTx, ctx: AppContext, day: s
     db
       .select({ lessonId: attendanceSheet.lessonId, status: attendanceSheet.status })
       .from(attendanceSheet)
-      .where(and(eq(attendanceSheet.unitId, ctx.unitId), inArray(attendanceSheet.lessonId, ids))),
+      .where(and(eq(attendanceSheet.organizationId, ctx.organizationId), eq(attendanceSheet.unitId, ctx.unitId), inArray(attendanceSheet.lessonId, ids))),
   ]);
 
   const sheetBy = new Map(sheets.map((s) => [s.lessonId, s.status]));

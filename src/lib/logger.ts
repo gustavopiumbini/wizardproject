@@ -3,10 +3,25 @@
 type Level = "debug" | "info" | "warn" | "error";
 type Fields = Record<string, unknown>;
 
+/**
+ * Erros viram só nome e códigos do Postgres. A mensagem nunca é registrada: a de erros de
+ * consulta do Drizzle inclui SQL e parâmetros (motivos de correção, nomes, hashes).
+ */
+export function describeError(error: Error): Fields {
+  const out: Fields = { name: error.name };
+  const cause: unknown = error.cause;
+  if (cause && typeof cause === "object") {
+    const { code, constraint } = cause as { code?: unknown; constraint?: unknown };
+    if (typeof code === "string") out.code = code;
+    if (typeof constraint === "string") out.constraint = constraint;
+  }
+  return out;
+}
+
 function serialize(fields: Fields): Fields {
   const out: Fields = {};
   for (const [key, value] of Object.entries(fields)) {
-    out[key] = value instanceof Error ? { name: value.name, message: value.message } : value;
+    out[key] = value instanceof Error ? describeError(value) : value;
   }
   return out;
 }
